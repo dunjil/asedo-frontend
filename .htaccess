@@ -1,0 +1,30 @@
+PassengerAppRoot "/home/asedrupq/new.asedoenergygroup.com"
+PassengerAppType node
+PassengerStartupFile server.js
+PassengerNodejs /home/asedrupq/nodevenv/new.asedoenergygroup.com/20/bin/node
+
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Don't rewrite requests for _next static files - let Node.js handle them
+    RewriteCond %{REQUEST_URI} ^/_next/ [OR]
+    RewriteCond %{REQUEST_URI} ^/static/
+    RewriteRule .* - [L]
+
+    # Serve actual static files directly if they exist
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)$ $1 [L]
+
+    # Serve directories directly if they exist
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^(.*)$ $1 [L]
+</IfModule>
+
+# Cache control for static assets
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif|map)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </IfModule>
+    Require all granted
+</FilesMatch>
