@@ -6,3 +6,10 @@ build
 *.log
 .env.local
 .env
+.env.*
+!.env.example
+
+# Archives
+*.zip
+*.tar.gz
+*.tar
