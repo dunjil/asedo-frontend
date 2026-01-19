@@ -9,6 +9,67 @@ const getApiUrl = () => {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || getApiUrl();
 
+// ============ CACHE SYSTEM ============
+// Simple in-memory cache to reduce API calls
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const cache = new Map<string, CacheEntry<any>>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache duration
+
+const getCachedData = <T>(key: string): T | null => {
+  const entry = cache.get(key);
+  if (!entry) return null;
+
+  // Check if cache is still valid
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.data as T;
+};
+
+const setCachedData = <T>(key: string, data: T): void => {
+  cache.set(key, { data, timestamp: Date.now() });
+};
+
+// Clear specific cache or all cache
+export const clearCache = (key?: string): void => {
+  if (key) {
+    // Clear specific key and related keys
+    for (const k of cache.keys()) {
+      if (k.startsWith(key)) {
+        cache.delete(k);
+      }
+    }
+  } else {
+    cache.clear();
+  }
+};
+
+// Cached fetch helper for GET requests
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cachedFetch = async (url: string, cacheKey: string): Promise<any> => {
+  // Check cache first
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  // Fetch from API
+  const response = await fetch(`${API_URL}${url}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}`);
+  }
+
+  const data = await response.json();
+  setCachedData(cacheKey, data);
+  return data;
+};
+
 // Helper function to get full image URL
 export const getImageUrl = (imagePath: string | null | undefined): string => {
   if (!imagePath) return '';
@@ -137,8 +198,8 @@ export const authAPI = {
 // Content API
 export const contentAPI = {
   get: async () => {
-    const response = await fetch(`${API_URL}/api/content/`);
-    return response.json();
+    const cacheKey = 'content';
+    return cachedFetch(`/api/content/`, cacheKey);
   },
 
   update: async (data: any) => {
@@ -146,6 +207,7 @@ export const contentAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('content');
     return response.json();
   },
 };
@@ -154,13 +216,14 @@ export const contentAPI = {
 export const blogAPI = {
   getAll: async (publishedOnly = true) => {
     const url = `/api/blog/?published_only=${publishedOnly}`;
-    const response = await fetch(`${API_URL}${url}`);
-    return response.json();
+    const cacheKey = `blog:list:${publishedOnly}`;
+    return cachedFetch(url, cacheKey);
   },
 
   getBySlug: async (slug: string) => {
-    const response = await fetch(`${API_URL}/api/blog/${slug}/`);
-    return response.json();
+    const url = `/api/blog/${slug}/`;
+    const cacheKey = `blog:${slug}`;
+    return cachedFetch(url, cacheKey);
   },
 
   create: async (data: any) => {
@@ -168,6 +231,7 @@ export const blogAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    clearCache('blog');
     return response.json();
   },
 
@@ -176,6 +240,7 @@ export const blogAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('blog');
     return response.json();
   },
 
@@ -183,6 +248,7 @@ export const blogAPI = {
     await apiRequest(`/api/blog/${id}`, {
       method: 'DELETE',
     });
+    clearCache('blog');
   },
 };
 
@@ -190,13 +256,14 @@ export const blogAPI = {
 export const projectsAPI = {
   getAll: async (publishedOnly: boolean = false) => {
     const url = publishedOnly ? `/api/projects/?published=true` : `/api/projects/`;
-    const response = await fetch(`${API_URL}${url}`);
-    return response.json();
+    const cacheKey = `projects:list:${publishedOnly}`;
+    return cachedFetch(url, cacheKey);
   },
 
   getBySlug: async (slug: string) => {
-    const response = await fetch(`${API_URL}/api/projects/${slug}/`);
-    return response.json();
+    const url = `/api/projects/${slug}/`;
+    const cacheKey = `projects:${slug}`;
+    return cachedFetch(url, cacheKey);
   },
 
   create: async (data: any) => {
@@ -204,6 +271,7 @@ export const projectsAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    clearCache('projects');
     return response.json();
   },
 
@@ -212,6 +280,7 @@ export const projectsAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('projects');
     return response.json();
   },
 
@@ -219,6 +288,7 @@ export const projectsAPI = {
     await apiRequest(`/api/projects/${id}`, {
       method: 'DELETE',
     });
+    clearCache('projects');
   },
 };
 
@@ -226,13 +296,14 @@ export const projectsAPI = {
 export const teamAPI = {
   getAll: async (publishedOnly: boolean = true) => {
     const url = publishedOnly ? '/api/team/?published_only=true' : '/api/team/?published_only=false';
-    const response = await fetch(`${API_URL}${url}`);
-    return response.json();
+    const cacheKey = `team:list:${publishedOnly}`;
+    return cachedFetch(url, cacheKey);
   },
 
   getById: async (id: number) => {
-    const response = await fetch(`${API_URL}/api/team/${id}`);
-    return response.json();
+    const url = `/api/team/${id}`;
+    const cacheKey = `team:${id}`;
+    return cachedFetch(url, cacheKey);
   },
 
   create: async (data: any) => {
@@ -240,6 +311,7 @@ export const teamAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    clearCache('team');
     return response.json();
   },
 
@@ -248,6 +320,7 @@ export const teamAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('team');
     return response.json();
   },
 
@@ -255,6 +328,7 @@ export const teamAPI = {
     await apiRequest(`/api/team/${id}`, {
       method: 'DELETE',
     });
+    clearCache('team');
   },
 };
 
@@ -286,13 +360,14 @@ export const uploadAPI = {
 export const careersAPI = {
   getAll: async (publishedOnly: boolean = true) => {
     const url = publishedOnly ? '/api/careers/?published=true' : '/api/careers/';
-    const response = await fetch(`${API_URL}${url}`);
-    return response.json();
+    const cacheKey = `careers:list:${publishedOnly}`;
+    return cachedFetch(url, cacheKey);
   },
 
   getById: async (id: number) => {
-    const response = await fetch(`${API_URL}/api/careers/${id}`);
-    return response.json();
+    const url = `/api/careers/${id}`;
+    const cacheKey = `careers:${id}`;
+    return cachedFetch(url, cacheKey);
   },
 
   create: async (data: any) => {
@@ -300,6 +375,7 @@ export const careersAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    clearCache('careers');
     return response.json();
   },
 
@@ -308,6 +384,7 @@ export const careersAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('careers');
     return response.json();
   },
 
@@ -315,6 +392,7 @@ export const careersAPI = {
     await apiRequest(`/api/careers/${id}`, {
       method: 'DELETE',
     });
+    clearCache('careers');
   },
 
   submitApplication: async (formData: FormData) => {
@@ -348,21 +426,42 @@ const transformService = (service: any) => {
 export const servicesAPI = {
   getAll: async (publishedOnly: boolean = true) => {
     const url = publishedOnly ? '/api/services/?published=true' : '/api/services/';
+    const cacheKey = `services:list:${publishedOnly}`;
+
+    // Check cache first
+    const cached = getCachedData<any[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const response = await fetch(`${API_URL}${url}`);
     if (!response.ok) {
       throw new Error('Failed to fetch services');
     }
     const data = await response.json();
-    return data.map(transformService);
+    const transformed = data.map(transformService);
+    setCachedData(cacheKey, transformed);
+    return transformed;
   },
 
   getBySlug: async (slug: string) => {
-    const response = await fetch(`${API_URL}/api/services/${slug}`);
+    const url = `/api/services/${slug}`;
+    const cacheKey = `services:${slug}`;
+
+    // Check cache first
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const response = await fetch(`${API_URL}${url}`);
     if (!response.ok) {
       throw new Error('Failed to fetch service');
     }
     const data = await response.json();
-    return transformService(data);
+    const transformed = transformService(data);
+    setCachedData(cacheKey, transformed);
+    return transformed;
   },
 
   create: async (data: any) => {
@@ -370,6 +469,7 @@ export const servicesAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    clearCache('services');
     return response.json();
   },
 
@@ -378,6 +478,7 @@ export const servicesAPI = {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    clearCache('services');
     return response.json();
   },
 
@@ -385,5 +486,6 @@ export const servicesAPI = {
     await apiRequest(`/api/services/${id}`, {
       method: 'DELETE',
     });
+    clearCache('services');
   },
 };
