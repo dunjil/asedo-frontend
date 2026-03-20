@@ -10,6 +10,7 @@ interface Career {
   department: string;
   location: string;
   employment_type: string;
+  description?: string;
   published: boolean;
   created_at: string;
   updated_at: string;

@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { careersAPI } from "../../../lib/api";
+import RichTextEditor from "../../../components/RichTextEditor";
 
 interface CareerForm {
   title: string;
   department: string;
   location: string;
   employment_type: string;
+  description?: string;
   published: boolean;
   created_at?: string;
 }
@@ -23,6 +25,7 @@ export default function CareerFormPage() {
     department: "",
     location: "",
     employment_type: "Full-time",
+    description: "",
     published: false,
     created_at: "",
   });
@@ -47,6 +50,7 @@ export default function CareerFormPage() {
         department: data.department,
         location: data.location,
         employment_type: data.employment_type,
+        description: data.description || "",
         published: data.published,
         created_at: createdDate,
       });
@@ -176,6 +180,20 @@ export default function CareerFormPage() {
               <option value="Contract">Contract</option>
               <option value="Internship">Internship</option>
             </select>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description / Job Details
+            </label>
+            <RichTextEditor
+              value={formData.description || ""}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, description: value }))
+              }
+              placeholder="What we're looking for, qualifications, how to apply..."
+            />
           </div>
 
           {/* Post Date */}
