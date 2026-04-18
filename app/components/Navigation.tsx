@@ -17,7 +17,6 @@ export default function Navigation({ currentPath }: NavigationProps) {
     { href: "/team", label: "OUR TEAM" },
     { href: "/blog", label: "NEWS" },
     { href: "/hse-policy", label: "HSE POLICY" },
-    { href: "/careers", label: "CAREERS" },
   ];
 
   return (

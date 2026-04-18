@@ -115,7 +115,6 @@ export default function Footer() {
                                 <Link href="/team" className="hover:underline">Our Team</Link>
                                 <Link href="/blog" className="hover:underline">Our Blog</Link>
                                 <Link href="/about-us" className="hover:underline">Who We Are</Link>
-                                <Link href="/careers" className="hover:underline">Careers</Link>
                                 <Link href="/hse-policy" className="hover:underline">HSE Policy</Link>
                             </div>
                         </div>
@@ -232,24 +231,7 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Careers Email */}
-                    <div className="flex flex-col gap-4">
-                        <h3 className="text-[#000] font-montserrat text-base md:text-lg font-semibold tracking-tight">Careers</h3>
-                        <div className="flex items-start gap-3">
-                            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 flex-shrink-0 text-[#00A89D]">
-                                <path d="M2.66675 8.00008C2.66675 6.15913 4.15908 4.66675 6.00008 4.66675H26.0001C27.841 4.66675 29.3334 6.15913 29.3334 8.00008V24.0001C29.3334 25.841 27.841 27.3334 26.0001 27.3334H6.00008C4.15913 27.3334 2.66675 25.841 2.66675 24.0001V8.00008Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M29.3334 8L16.0001 16.6667L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <div className="flex flex-col gap-1">
-                                <a href="mailto:careers@asedoenergygroup.com" className="text-[#000206] font-openSans text-sm font-normal hover:text-[#00A89D] transition-colors">
-                                    careers@asedoenergygroup.com
-                                </a>
-                                <p className="text-[#4D5767] font-openSans text-xs">
-                                    Join Our Team
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
 
                 {/* Bottom Bar */}
