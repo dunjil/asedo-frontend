@@ -52,8 +52,8 @@ export default function TeamPage() {
       <Navigation currentPath="/team" />
 
       <Hero
-        title="Meet Our Team"
-        subtitle="Driven by vision, powered by expertise, committed to excellence in transforming Africa's energy landscape."
+        title="Leadership and Governance"
+        subtitle="ASEDO Energy Group operates under a centralized governance model anchored by the Office of the Chairman and supported by a structured executive leadership framework established ahead of the Group’s official launch. The structure is designed to ensure disciplined execution across global operations, commercial expansion, technology integration, and financial stewardship."
         badge="Leadership Team"
         image="/backgrounds/grey-refinery.webp"
       />
@@ -76,15 +76,15 @@ export default function TeamPage() {
               </h2>
             </div>
 
-            {/* Clean Team Members Grid */}
+            {/* Team Members Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {members.map((member) => (
                 <div
                   key={member.id}
                   className="group relative bg-white rounded-xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100/50 hover:border-[#00A89D]/30"
                 >
-                  {/* Name and Title Only */}
-                  <div className="text-center">
+                  {/* Name and Title */}
+                  <div className="text-center mb-4">
                     <h3 className="text-[#0A1E3F] font-montserrat text-lg md:text-xl font-bold leading-tight mb-2 group-hover:text-[#00A89D] transition-colors duration-300">
                       {member.name}
                     </h3>
@@ -92,6 +92,16 @@ export default function TeamPage() {
                       {member.title}
                     </p>
                   </div>
+
+                  {/* Bio */}
+                  {member.bio && (
+                    <>
+                      <div className="w-10 h-0.5 bg-[#00A89D]/40 mx-auto mb-4 group-hover:w-full transition-all duration-500" />
+                      <p className="text-gray-500 font-openSans text-sm leading-relaxed text-center">
+                        {member.bio}
+                      </p>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
