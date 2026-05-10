@@ -591,7 +591,7 @@ export default function AsedoWebsiteRedesignLofi() {
                     </div>
                     <div>
                       <h4 className="text-[#0A1E3F] font-montserrat text-xl font-bold mb-1">
-                        Victor O. Adegbite
+                        E. Adegbite
                       </h4>
                       <p className="text-[#00A89D] font-openSans text-base font-semibold">
                         Founder & Chairman
